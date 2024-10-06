@@ -5,8 +5,6 @@ import { Card, CardHeader, CardBody, Textarea, Button } from '@nextui-org/react'
 
 function App() {
 
-  const [hovered, setHovered] = useState(false);
-  const [clicked, setClicked] = useState(false);
   const [selectedWord, setSelectedWord] = useState<string>('');
 
   const handleMouseUp = () => {
@@ -32,7 +30,7 @@ function App() {
     {/* Left Card */}
     <Card className="w-1/2 h-full">
       <CardHeader className="flex flex-row justify-between items-center gap-4">
-        <h4 className="text font-bold">Word to Visualize: {selectedWord}</h4>
+        <h4 className="text font-bold">Selected word: {selectedWord}</h4>
         <Button color="warning" variant="flat" onClick={handleWordSubmit}>
           Help me!
         </Button>
@@ -53,7 +51,7 @@ function App() {
       <Card className="flex-1">
         <CardHeader className="flex justify-center">
           <h4 className="font-bold text-center">
-            Image
+            Images
           </h4>
         </CardHeader>
         <CardBody>
