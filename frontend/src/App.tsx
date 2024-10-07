@@ -21,6 +21,8 @@ interface DictionaryEntry {
 
 
 
+
+
 function App() {
 
   
@@ -28,6 +30,8 @@ function App() {
   const [selectedWord, setSelectedWord] = useState<string>('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [dictionary, setDictionary] = useState<DictionaryEntry[]>([]);
+  const [carouselKey, setCarouselKey] = useState(0);
+  const [dictionaryKey, setDictionaryKey] = useState(0);
 
   const handleMouseUp = () => {
     const selection = window.getSelection();
@@ -70,6 +74,10 @@ function App() {
         } else if (dictionaryResponse.data.error) {
           console.error(`Dictionary Error: ${dictionaryResponse.data.error}`);
         }
+
+        // Update keys to trigger re-render
+        setCarouselKey((prevKey) => prevKey + 1);
+        setDictionaryKey((prevKey) => prevKey + 1);
       } catch (error) {
         console.error("An error occurred:", error);
       }
@@ -108,15 +116,15 @@ function App() {
           </h4>
         </CardHeader>
         <CardBody>
-         <ImageCarousel images={imageUrls} />
+         <ImageCarousel key={carouselKey} images={imageUrls} />
         </CardBody>
       </Card>
       <Card className="flex-1">
         <CardHeader className="flex justify-center">
-          <h4 className="font-bold text-center">Dictionary for {selectedWord}</h4>
+          <h4 className="font-bold text-center">Dictionary Entries</h4>
         </CardHeader>
         <CardBody>
-         <Dictionary entries={dictionary}/>
+         <Dictionary key={dictionaryKey} entries={dictionary} word={selectedWord}/>
         </CardBody>
       </Card>
     </div>

@@ -17,10 +17,17 @@ interface Pronunciation {
 
   interface DictionaryProps {
     entries: DictionaryEntry[];
+    word: string;
   }
 
-const Dictionary: React.FC<DictionaryProps> = ({ entries }) => {
+const Dictionary: React.FC<DictionaryProps> = ({ entries, word }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  if (!entries || entries.length === 0) {
+    return <div>No definitions available for "{word}".</div>;
+  }
+
+  const currentEntry = entries[currentIndex];
 
   // Handler to go to the next entry in the array
   const handleNext = () => {
@@ -32,14 +39,15 @@ const Dictionary: React.FC<DictionaryProps> = ({ entries }) => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + entries.length) % entries.length);
   };
 
-  const currentEntry = entries[currentIndex];
+  
 
   return (
     <div className="flex flex-col items-center gap-6 p-4">
       <Card className="w-full max-w-screen-md shadow-md border border-gray-200">
         <CardHeader className="flex justify-between items-center bg-gray-100 p-4 rounded-t-md">
           <div className="font-bold text-lg">
-            <span className="text-purple-600">{currentEntry.hwi.hw}</span>
+            <span className="text-purple-600">{word}</span> {/* Displaying the searched word prominently */}
+            <span className="text-purple-600 ml-2">{currentEntry.hwi.hw}</span>
             {currentEntry.hwi.prs && currentEntry.hwi.prs.length > 0 && (
               <span className="ml-2 text-sm text-gray-500">({currentEntry.hwi.prs[0].mw})</span>
             )}
@@ -61,10 +69,10 @@ const Dictionary: React.FC<DictionaryProps> = ({ entries }) => {
       </Card>
 
       <div className="flex justify-between w-full max-w-screen-md">
-        <Button variant="flat" color="warning" onClick={handlePrev}>
+        <Button variant="flat" color="warning" onClick={handlePrev} disabled={currentIndex === 0}>
           Previous
         </Button>
-        <Button variant="flat" color="warning" onClick={handleNext}>
+        <Button variant="flat" color="warning" onClick={handleNext} disabled={currentIndex === entries.length - 1}>
           Next
         </Button>
       </div>
