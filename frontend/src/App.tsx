@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardBody, Button} from '@nextui-org/react';
 import Dictionary from './components/Dictionary';
 import ImageCarousel from './components/ImageCarousel';
@@ -25,6 +25,8 @@ interface DictionaryEntry {
 
 function App() {
 
+    
+
   
 
   const [selectedWord, setSelectedWord] = useState<string>('');
@@ -32,6 +34,9 @@ function App() {
   const [dictionary, setDictionary] = useState<DictionaryEntry[]>([]);
   const [carouselKey, setCarouselKey] = useState(0);
   const [dictionaryKey, setDictionaryKey] = useState(0);
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+
 
   const handleMouseUp = () => {
     const selection = window.getSelection();
@@ -45,11 +50,7 @@ function App() {
 
   const handleWordSubmit = async () => {
 
-  
-
     if (selectedWord) {
-
-
       if (selectedWord.trim().includes(' ')) {
         alert('Word to visualize should be one word, not multiple words separated by a space.');
         return;
@@ -71,10 +72,14 @@ function App() {
         if (dictionaryResponse.data) {
           console.log("Dictionary definition:", dictionaryResponse.data);
           setDictionary(dictionaryResponse.data);
+          setDataLoaded(true);
         } else if (dictionaryResponse.data.error) {
           console.error(`Dictionary Error: ${dictionaryResponse.data.error}`);
         }
 
+
+        // Set dataLoaded to true once both sets of data are loaded
+        
         // Update keys to trigger re-render
         setCarouselKey((prevKey) => prevKey + 1);
         setDictionaryKey((prevKey) => prevKey + 1);
@@ -83,6 +88,21 @@ function App() {
       }
     }
   };
+
+  useEffect(() => {
+    if (dataLoaded) {
+      const intervalId = setInterval(() => {
+        setCarouselKey((prevKey) => prevKey + 1);
+        setDictionaryKey((prevKey) => prevKey + 1);
+        console.log("Dictionary entries at interval:", dictionary);
+        console.log("typeof" + typeof(dictionary))
+        console.log("Image URLs at interval:", imageUrls);
+      }, 5000); // 5 seconds interval
+
+      // Clean up interval on component unmount or when data changes
+      return () => clearInterval(intervalId);
+    }
+  }, [dataLoaded]);
 
   return (
     <>
@@ -119,14 +139,52 @@ function App() {
          <ImageCarousel key={carouselKey} images={imageUrls} />
         </CardBody>
       </Card>
+
       <Card className="flex-1">
-        <CardHeader className="flex justify-center">
-          <h4 className="font-bold text-center">Dictionary Entries</h4>
-        </CardHeader>
-        <CardBody>
-         <Dictionary key={dictionaryKey} entries={dictionary} word={selectedWord}/>
-        </CardBody>
-      </Card>
+    <CardHeader className="flex justify-center">
+      <h4 className="font-bold text-center">Dictionary Entry</h4>
+    </CardHeader>
+    <CardBody>
+      {dictionary.length > 0 ? (
+        <>
+          {/* Headword and Details */}
+          <CardHeader className="flex justify-between items-center bg-gray-100 p-4 rounded-t-md">
+            <div className="font-bold text-lg">
+              <span className="text-purple-600">{selectedWord}</span> {/* Displaying the searched word prominently */}
+              {dictionary[0].hwi?.hw && (
+                <span className="text-purple-600 ml-2">{dictionary[0].hwi.hw}</span>
+              )}
+              {dictionary[0].hwi?.prs && dictionary[0].hwi.prs.length > 0 && (
+                <span className="ml-2 text-sm text-gray-500">({dictionary[0].hwi.prs[0].mw})</span>
+              )}
+            </div>
+            <div className="text-sm text-gray-500">
+              {dictionary[0].fl && <span className="mr-2">({dictionary[0].fl})</span>}
+              {dictionary[0].date && <span>First Use: {dictionary[0].date}</span>}
+            </div>
+          </CardHeader>
+
+          {/* Definitions */}
+          <CardBody className="bg-white p-4 rounded-b-md">
+            {dictionary[0].shortdef?.length > 0 ? (
+              <ul className="list-disc pl-6 space-y-2">
+                {dictionary[0].shortdef.map((definition, idx) => (
+                  <li key={idx} className="text-gray-700">
+                    {definition}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-gray-500">No definitions available.</div>
+            )}
+          </CardBody>
+        </>
+      ) : (
+        <div className="text-gray-500 p-4">No entries available.</div>
+      )}
+    </CardBody>
+  </Card>
+      
     </div>
   </div>
 </div>

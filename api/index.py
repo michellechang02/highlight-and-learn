@@ -48,26 +48,36 @@ async def unsplash_fetch(word: str):
 
 @app.get("/dictionary/{word}")
 async def dictionary_fetch(word: str):
-    response = requests.get(f"{BASE_URL}/{word}?key={MERRIAM_KEY}")
-    if response.status_code == 200:
+    try:
+        response = requests.get(f"{BASE_URL}/{word}?key={MERRIAM_KEY}")
+
+        # If request fails, return an empty list in "entries"
+        if response.status_code != 200:
+            return {"entries": []}
+
         data = response.json()
         formatted_entries = []
 
-        for entry in data:
-            if isinstance(entry, dict):  # Ensure it is a dictionary entry
-                date = entry.get("date", "")
-                hwi = entry.get("hwi", {})
-                shortdef = entry.get("shortdef", [])
-                fl = entry.get("fl", "")  # Extract part of speech (fl)
+        # Proceed if data is a list, as expected for dictionary entries
+        if isinstance(data, list):
+            for entry in data:
+                if isinstance(entry, dict):  # Ensure it is a dictionary entry
+                    date = entry.get("date", "")
+                    hwi = entry.get("hwi", {})
+                    shortdef = entry.get("shortdef", [])
+                    fl = entry.get("fl", "")
 
-                # Create a DictionaryEntry object
-                dictionary_entry = DictionaryEntry(date, hwi, shortdef, fl)
-                formatted_entries.append(dictionary_entry.to_dict())
+                    # Create a DictionaryEntry object and convert to dict
+                    dictionary_entry = DictionaryEntry(date, hwi, shortdef, fl)
+                    formatted_entries.append(dictionary_entry.to_dict())
+
+        # Ensure formatted_entries is always returned as an array, even if empty
         return {"entries": formatted_entries}
 
-    else:
-        return {"error": "Unable to fetch definition", "status_code": response.status_code}
-
+    except requests.exceptions.RequestException as e:
+        # In case of a network error or other request-related issue, log and return empty entries
+        print(f"Request error: {e}")
+        return {"entries": []}
 
 # # Run using uvicorn if needed
 # if __name__ == "__main__":
