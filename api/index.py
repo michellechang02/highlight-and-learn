@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 from dotenv import load_dotenv
 import os
-
+from models.DictionaryEntry import DictionaryEntry
 
 
 ### Create FastAPI instance with custom docs and openapi url
@@ -50,7 +50,21 @@ async def unsplash_fetch(word: str):
 async def dictionary_fetch(word: str):
     response = requests.get(f"{BASE_URL}/{word}?key={MERRIAM_KEY}")
     if response.status_code == 200:
-        return response.json()
+        data = response.json()
+        formatted_entries = []
+
+        for entry in data:
+            if isinstance(entry, dict):  # Ensure it is a dictionary entry
+                date = entry.get("date", "")
+                hwi = entry.get("hwi", {})
+                shortdef = entry.get("shortdef", [])
+                fl = entry.get("fl", "")  # Extract part of speech (fl)
+
+                # Create a DictionaryEntry object
+                dictionary_entry = DictionaryEntry(date, hwi, shortdef, fl)
+                formatted_entries.append(dictionary_entry.to_dict())
+        return {"entries": formatted_entries}
+
     else:
         return {"error": "Unable to fetch definition", "status_code": response.status_code}
 

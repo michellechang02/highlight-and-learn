@@ -1,11 +1,33 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { Card, CardHeader, CardBody, Button } from '@nextui-org/react';
+import { Card, CardHeader, CardBody, Button} from '@nextui-org/react';
+import Dictionary from './components/Dictionary';
+import ImageCarousel from './components/ImageCarousel';
+
+
+interface Pronunciation {
+  mw: string; // Pronunciation string
+}
+
+interface DictionaryEntry {
+  date?: string; // Date of first use, optional
+  hwi: {
+    hw: string; // Headword
+    prs?: Pronunciation[]; // Pronunciation array, optional
+  };
+  shortdef: string[]; // Short definitions array
+  fl: string; // Part of speech
+}
+
 
 
 function App() {
 
+  
+
   const [selectedWord, setSelectedWord] = useState<string>('');
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [dictionary, setDictionary] = useState<DictionaryEntry[]>([]);
 
   const handleMouseUp = () => {
     const selection = window.getSelection();
@@ -35,6 +57,7 @@ function App() {
         const unsplashResponse = await axios.get(`https://highlight-and-learn.vercel.app/unsplash/${selectedWord}`);
         if (unsplashResponse.data && unsplashResponse.data.regular_urls) {
           console.log("Image URLs from Unsplash:", unsplashResponse.data.regular_urls);
+          setImageUrls(unsplashResponse.data.regular_urls);
         } else if (unsplashResponse.data.error) {
           console.error(`Unsplash Error: ${unsplashResponse.data.error}`);
         }
@@ -43,6 +66,7 @@ function App() {
         const dictionaryResponse = await axios.get(`https://highlight-and-learn.vercel.app/dictionary/${selectedWord}`);
         if (dictionaryResponse.data) {
           console.log("Dictionary definition:", dictionaryResponse.data);
+          setDictionary(dictionaryResponse.data);
         } else if (dictionaryResponse.data.error) {
           console.error(`Dictionary Error: ${dictionaryResponse.data.error}`);
         }
@@ -84,15 +108,15 @@ function App() {
           </h4>
         </CardHeader>
         <CardBody>
-          {/* Insert definition content here */}
+         <ImageCarousel images={imageUrls} />
         </CardBody>
       </Card>
       <Card className="flex-1">
         <CardHeader className="flex justify-center">
-          <h4 className="font-bold text-center">Definition</h4>
+          <h4 className="font-bold text-center">Dictionary for {selectedWord}</h4>
         </CardHeader>
         <CardBody>
-          {/* Insert image content here */}
+         <Dictionary entries={dictionary}/>
         </CardBody>
       </Card>
     </div>
