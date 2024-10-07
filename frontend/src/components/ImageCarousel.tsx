@@ -3,10 +3,9 @@ import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // Import Carousel CSS
 import { Image } from "@nextui-org/react";
 
-// Define the prop types for the ImageCarousel component
 interface ImageCarouselProps {
-    images: string[];
-  }
+  images: string[];
+}
 
 const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
   return (
@@ -21,13 +20,11 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
         className="rounded-lg shadow-md"
       >
         {images.map((image, index) => (
-          <div key={index} className="w-full h-64">
+          <div key={index} className="w-full h-64 flex justify-center items-center">
             <Image
               src={image}
               alt={`Carousel Image ${index + 1}`}
-              className="w-full h-full object-cover rounded-lg"
-              width={500}
-              height={400}
+              className="object-contain w-auto h-full max-h-full rounded-lg"
             />
           </div>
         ))}
