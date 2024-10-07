@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { Card, CardHeader, CardBody, Textarea, Button } from '@nextui-org/react';
+import { Card, CardHeader, CardBody, Button } from '@nextui-org/react';
 
 
 function App() {
@@ -17,9 +17,38 @@ function App() {
     }
   };
 
-  const handleWordSubmit = () => {
+  const handleWordSubmit = async () => {
+
+  
+
     if (selectedWord) {
-      alert(`Word to visualize: ${selectedWord}`);
+
+
+      if (selectedWord.trim().includes(' ')) {
+        alert('Word to visualize should be one word, not multiple words separated by a space.');
+        return;
+      }
+
+      try {
+  
+        // Fetch image URLs from Unsplash API
+        const unsplashResponse = await axios.get(`https://highlight-and-learn.vercel.app/unsplash/${selectedWord}`);
+        if (unsplashResponse.data && unsplashResponse.data.regular_urls) {
+          console.log("Image URLs from Unsplash:", unsplashResponse.data.regular_urls);
+        } else if (unsplashResponse.data.error) {
+          console.error(`Unsplash Error: ${unsplashResponse.data.error}`);
+        }
+  
+        // Fetch dictionary definition from Merriam-Webster API
+        const dictionaryResponse = await axios.get(`https://highlight-and-learn.vercel.app/dictionary/${selectedWord}`);
+        if (dictionaryResponse.data) {
+          console.log("Dictionary definition:", dictionaryResponse.data);
+        } else if (dictionaryResponse.data.error) {
+          console.error(`Dictionary Error: ${dictionaryResponse.data.error}`);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
     }
   };
 
