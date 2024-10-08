@@ -79,6 +79,11 @@ async def dictionary_fetch(word: str):
         print(f"Request error: {e}")
         return {"entries": []}
 
+@app.get("/difficulty/{word}/{entire_text}")
+async def difficulty_fetch(word: str, entire_text: str):
+    
+
+
 # # Run using uvicorn if needed
 # if __name__ == "__main__":
 #     uvicorn.run(app, host="127.0.0.1", port=8000)

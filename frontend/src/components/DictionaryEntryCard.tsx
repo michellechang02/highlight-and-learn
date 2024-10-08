@@ -42,7 +42,7 @@ const DictionaryEntryCard: React.FC<DictionaryEntryCardProps> = ({ dictionary, s
   return (
     <Card className="flex-1 shadow-md border border-gray-200">
       <CardHeader className="flex justify-center">
-        <h4 className="font-bold text-center">Dictionary Entry</h4>
+        <h4 className="font-bold text-center">Dictionary Entries</h4>
       </CardHeader>
       <CardBody>
         {dictionary.length > 0 ? (
