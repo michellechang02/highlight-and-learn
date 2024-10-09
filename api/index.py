@@ -79,9 +79,6 @@ async def dictionary_fetch(word: str):
         print(f"Request error: {e}")
         return {"entries": []}
 
-@app.get("/difficulty/{word}/{entire_text}")
-async def difficulty_fetch(word: str, entire_text: str):
-    
 
 
 # # Run using uvicorn if needed

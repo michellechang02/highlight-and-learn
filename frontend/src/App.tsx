@@ -1,8 +1,7 @@
 import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardHeader, CardBody, Button} from '@nextui-org/react';
 import DictionaryEntryCard from './components/DictionaryEntryCard';
-import ImageCarousel from './components/ImageCarousel';
 import TextWithInputs from './components/TextWithInputs';
 import WordList from './components/WordList';
 
@@ -26,9 +25,9 @@ function App() {
 
 
   const [selectedWord, setSelectedWord] = useState<string>('');
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  // const [imageUrls, setImageUrls] = useState<string[]>([]);
+  // const [carouselKey, setCarouselKey] = useState(0);
   const [dictionary, setDictionary] = useState<DictionaryEntry[]>([]);
-  const [carouselKey, setCarouselKey] = useState(0);
   const [dictionaryWord, setDictionaryWord] = useState<string>('');
   const [highlightedWords, setHighlightedWords] = useState<string[]>([]);
   const [text, setText] = useState<string>('');
@@ -75,7 +74,7 @@ function App() {
         // Handle Unsplash response
         if (unsplashResponse.status === 200 && unsplashResponse.data && unsplashResponse.data.regular_urls) {
           console.log("Image URLs from Unsplash:", unsplashResponse.data.regular_urls);
-          setImageUrls(unsplashResponse.data.regular_urls);
+          // setImageUrls(unsplashResponse.data.regular_urls);
         } else if (unsplashResponse.data?.error) {
           console.error(`Unsplash Error: ${unsplashResponse.data.error}`);
         }
@@ -89,7 +88,7 @@ function App() {
         }
 
         // Update keys to trigger re-render
-        setCarouselKey((prevKey) => prevKey + 1);
+        // setCarouselKey((prevKey) => prevKey + 1);
       } catch (error) {
         console.error("An error occurred:", error);
       }
