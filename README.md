@@ -24,3 +24,5 @@ Create a Word List, of all the words you've highlighted.
 
 Fill in the Blank! makes all the words you've clicked on into <Inputs /> 
 and checks whether you can fill in the blank.
+
+<img width="1450" alt="Screenshot 2024-10-08 at 6 32 39 PM" src="https://github.com/user-attachments/assets/2eb59b69-66a7-4593-aefe-c40e345c1a81">
