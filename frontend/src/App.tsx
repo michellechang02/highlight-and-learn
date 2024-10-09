@@ -38,6 +38,28 @@ function App() {
     setText(e.target.value);
   };
 
+  const fetchDictionary = async (dictionaryWord: string) => {
+    try {
+      setDictionaryWord(dictionaryWord.toLowerCase());
+      const [dictionaryResponse] = await Promise.all([
+        axios.get(`https://highlight-and-learn.vercel.app/dictionary/${dictionaryWord}`)
+      ]);
+  
+      // Handle Dictionary response
+      if (dictionaryResponse.status === 200 && dictionaryResponse.data && dictionaryResponse.data.entries) {
+        console.log("Dictionary definition:", dictionaryResponse.data.entries[0]);
+        // Call the setDictionary function here with the result
+        setDictionary(dictionaryResponse.data.entries); // Ensure setting entire entries array
+      } else if (dictionaryResponse.data?.error) {
+        console.error(`Dictionary Error: ${dictionaryResponse.data.error}`);
+      }
+  
+  
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
   const handleMouseUp = () => {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim();
@@ -138,7 +160,7 @@ function App() {
         </Button>
       </CardHeader>
         <CardBody>
-         <WordList highlightedWords={highlightedWords}/>
+         <WordList highlightedWords={highlightedWords} fetchDictionary={fetchDictionary}/>
         </CardBody>
       </Card>
       <DictionaryEntryCard dictionary={dictionary} selectedWord={dictionaryWord} />
