@@ -42,7 +42,7 @@ function App() {
     try {
       setDictionaryWord(dictionaryWord.toLowerCase());
       const [dictionaryResponse] = await Promise.all([
-        axios.get(`https://highlight-and-learn.vercel.app/dictionary/${dictionaryWord}`)
+        axios.get(`https://highlight-and-learn-backend.vercel.app/dictionary/${dictionaryWord}`)
       ]);
   
       // Handle Dictionary response
@@ -89,8 +89,8 @@ function App() {
       try {
         // Fetch both image URLs and dictionary definition simultaneously
         const [unsplashResponse, dictionaryResponse] = await Promise.all([
-          axios.get(`https://highlight-and-learn.vercel.app/unsplash/${dictionaryWord}`),
-          axios.get(`https://highlight-and-learn.vercel.app/dictionary/${dictionaryWord}`)
+          axios.get(`https://highlight-and-learn-backend.vercel.app/unsplash/${dictionaryWord}`),
+          axios.get(`https://highlight-and-learn-backend.vercel.app/dictionary/${dictionaryWord}`)
         ]);
   
         // Handle Unsplash response
