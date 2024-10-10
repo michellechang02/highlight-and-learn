@@ -20,7 +20,7 @@ interface DictionaryEntryCardProps {
   selectedWord: string;
 }
 
-const DictionaryEntryCard: React.FC<DictionaryEntryCardProps> = ({ dictionary, selectedWord }) => {
+const DictionaryEntryCard: React.FC<DictionaryEntryCardProps> = ({  dictionary, selectedWord }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Handler to go to the next entry in the array
@@ -40,10 +40,6 @@ const DictionaryEntryCard: React.FC<DictionaryEntryCardProps> = ({ dictionary, s
   const currentEntry = dictionary[currentIndex];
 
   return (
-    <Card className="flex-1 shadow-md border border-gray-200">
-      <CardHeader className="flex justify-center">
-        <h4 className="font-bold text-center">Dictionary Entries</h4>
-      </CardHeader>
       <CardBody>
         {dictionary.length > 0 ? (
           <>
@@ -106,7 +102,6 @@ const DictionaryEntryCard: React.FC<DictionaryEntryCardProps> = ({ dictionary, s
           <div className="text-gray-500 p-4">No entries available.</div>
         )}
       </CardBody>
-    </Card>
   );
 };
 

@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { useState } from 'react';
+import { FaTrashAlt } from 'react-icons/fa';
 import { Card, CardHeader, CardBody, Button} from '@nextui-org/react';
 import DictionaryEntryCard from './components/DictionaryEntryCard';
 import TextWithInputs from './components/TextWithInputs';
 import WordList from './components/WordList';
+import ImageCarousel from './components/ImageCarousel';
 
 
 interface Pronunciation {
@@ -25,13 +27,36 @@ function App() {
 
 
   const [selectedWord, setSelectedWord] = useState<string>('');
-  // const [imageUrls, setImageUrls] = useState<string[]>([]);
-  // const [carouselKey, setCarouselKey] = useState(0);
   const [dictionary, setDictionary] = useState<DictionaryEntry[]>([]);
+  const [dictionaryKey, setDictionaryKey] = useState<number>(0);
   const [dictionaryWord, setDictionaryWord] = useState<string>('');
   const [highlightedWords, setHighlightedWords] = useState<string[]>([]);
   const [text, setText] = useState<string>('');
   const [readingTime, setReadingTime] = useState<boolean>(true);
+  const [highlightedWordsKey, setHighlightedWordsKey] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState('Dictionary');
+  const [carouselKey, setCarouselKey] = useState<number>(0);
+  const [images, setImages] = useState<string[]>([]);
+
+
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setHighlightedWords([]);
+    setDictionaryWord('');
+    setDictionary([]);
+    setHighlightedWordsKey((prevKey) => prevKey + 1);
+    setDictionaryKey((prevKey) => prevKey + 1);
+    setCarouselKey((prevKey) => prevKey + 1);
+  };
+
+  const handleTextDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setText('');
+    setHighlightedWords([]);
+    setDictionaryWord('');
+    setDictionary([]);
+    setHighlightedWordsKey((prevKey) => prevKey + 1);
+    setDictionaryKey((prevKey) => prevKey + 1);
+    setCarouselKey((prevKey) => prevKey + 1);
+  }
 
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -41,9 +66,18 @@ function App() {
   const fetchDictionary = async (dictionaryWord: string) => {
     try {
       setDictionaryWord(dictionaryWord.toLowerCase());
-      const [dictionaryResponse] = await Promise.all([
+      const [unsplashResponse, dictionaryResponse] = await Promise.all([
+        axios.get(`https://highlight-and-learn-backend.vercel.app/unsplash/${dictionaryWord}`),
         axios.get(`https://highlight-and-learn-backend.vercel.app/dictionary/${dictionaryWord}`)
       ]);
+
+      // Handle Unsplash response
+      if (unsplashResponse.status === 200 && unsplashResponse.data && unsplashResponse.data.regular_urls) {
+        console.log("Image URLs from Unsplash:", unsplashResponse.data.regular_urls);
+        setImages(unsplashResponse.data.regular_urls);
+      } else if (unsplashResponse.data?.error) {
+        console.error(`Unsplash Error: ${unsplashResponse.data.error}`);
+      }
   
       // Handle Dictionary response
       if (dictionaryResponse.status === 200 && dictionaryResponse.data && dictionaryResponse.data.entries) {
@@ -53,6 +87,9 @@ function App() {
       } else if (dictionaryResponse.data?.error) {
         console.error(`Dictionary Error: ${dictionaryResponse.data.error}`);
       }
+
+      setCarouselKey((prevKey) => prevKey + 1);
+      setDictionaryKey((prevKey) => prevKey + 1);
   
   
     } catch (error) {
@@ -73,12 +110,18 @@ function App() {
   const handleWordSubmit = async () => {
 
     if (selectedWord) {
+      if (!/[a-zA-Z]/.test(selectedWord)) {
+        alert('Word to visualize should contain at least one alphabet character.');
+        return;
+      }
+
       if (selectedWord.trim().includes(' ')) {
         alert('Word to visualize should be one word, not multiple words separated by a space.');
         return;
       }
 
-      setDictionaryWord(selectedWord.toLowerCase());
+      const wordToFetch = selectedWord.toLowerCase();
+      setDictionaryWord(wordToFetch); // Set the word before the API calls
       setHighlightedWords((prevHighlightedWords) => {
         if (!prevHighlightedWords.includes(selectedWord)) {
           return [...prevHighlightedWords, selectedWord];
@@ -89,14 +132,14 @@ function App() {
       try {
         // Fetch both image URLs and dictionary definition simultaneously
         const [unsplashResponse, dictionaryResponse] = await Promise.all([
-          axios.get(`https://highlight-and-learn-backend.vercel.app/unsplash/${dictionaryWord}`),
-          axios.get(`https://highlight-and-learn-backend.vercel.app/dictionary/${dictionaryWord}`)
+          axios.get(`https://highlight-and-learn-backend.vercel.app/unsplash/${wordToFetch}`),
+          axios.get(`https://highlight-and-learn-backend.vercel.app/dictionary/${wordToFetch}`)
         ]);
   
         // Handle Unsplash response
         if (unsplashResponse.status === 200 && unsplashResponse.data && unsplashResponse.data.regular_urls) {
           console.log("Image URLs from Unsplash:", unsplashResponse.data.regular_urls);
-          // setImageUrls(unsplashResponse.data.regular_urls);
+          setImages(unsplashResponse.data.regular_urls);
         } else if (unsplashResponse.data?.error) {
           console.error(`Unsplash Error: ${unsplashResponse.data.error}`);
         }
@@ -110,7 +153,8 @@ function App() {
         }
 
         // Update keys to trigger re-render
-        // setCarouselKey((prevKey) => prevKey + 1);
+        setCarouselKey((prevKey) => prevKey + 1);
+        setDictionaryKey((prevKey) => prevKey + 1);
       } catch (error) {
         console.error("An error occurred:", error);
       }
@@ -128,9 +172,14 @@ function App() {
     <Card className="w-1/2 h-full">
       <CardHeader className="flex flex-row justify-between items-center gap-4">
         <h4 className="text font-bold">Selected word: {selectedWord}</h4>
-        <Button color="warning" variant="flat" onClick={handleWordSubmit}>
-          Highlight me!
-        </Button>
+        <div className="flex gap-2">
+          <Button color="warning" variant="flat" onClick={handleWordSubmit}>
+            Highlight me!
+          </Button>
+          <Button color="danger" variant="flat" onClick={handleTextDelete} isIconOnly>
+            <FaTrashAlt />
+          </Button>
+        </div>
       </CardHeader>
       <CardBody
         className="flex flex-col h-full"
@@ -154,17 +203,48 @@ function App() {
       <Card className="flex-1">
       <CardHeader className="flex justify-between items-center">
         <h4 className="font-bold ml-2">Highlighted Word List</h4>
-        <Button color="warning" variant="flat" className="ml-4"
-        onClick={() => setReadingTime(false)}>
-          Quiz Me!
-        </Button>
+        <div className="flex items-center gap-2 ml-4">
+          <Button color="warning" variant="flat" onClick={() => setReadingTime(false)}>
+            Quiz Me!
+          </Button>
+          <Button color="danger" isIconOnly variant="flat" onClick={(e) => handleDelete(e)}>
+            <FaTrashAlt />
+          </Button>
+        </div>
       </CardHeader>
         <CardBody>
-         <WordList highlightedWords={highlightedWords} fetchDictionary={fetchDictionary}/>
+         <WordList key={highlightedWordsKey}
+         highlightedWords={highlightedWords}
+         fetchDictionary={fetchDictionary}/>
         </CardBody>
       </Card>
-      <DictionaryEntryCard dictionary={dictionary} selectedWord={dictionaryWord} />
 
+    <Card className="flex-1 shadow-md border border-gray-200">
+    <CardHeader className="flex justify-start">
+        <div className="flex gap-4">
+          <Button
+            color={activeTab === 'Dictionary' ? 'warning' : 'default'}
+            variant="flat"
+            onClick={() => setActiveTab('Dictionary')}
+          >
+            Dictionary
+          </Button>
+          <Button
+            color={activeTab === 'Images' ? 'warning' : 'default'}
+            variant="flat"
+            onClick={() => setActiveTab('Images')}
+          >
+            Images
+          </Button>
+        </div>
+      </CardHeader>
+      {activeTab === 'Dictionary' ?
+      <DictionaryEntryCard key={dictionaryKey} dictionary={dictionary} selectedWord={dictionaryWord} />
+      : 
+      <ImageCarousel key={carouselKey} images={images} />
+      
+      }
+      </Card>
     
       
     </div>
