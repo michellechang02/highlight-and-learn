@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardBody, Button } from '@nextui-org/react';
+import { CardBody, Button } from '@nextui-org/react';
 
 interface Pronunciation {
   mw: string; // Pronunciation string

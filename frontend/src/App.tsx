@@ -39,7 +39,7 @@ function App() {
   const [images, setImages] = useState<string[]>([]);
 
 
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDelete = () => {
     setHighlightedWords([]);
     setDictionaryWord('');
     setDictionary([]);
@@ -48,7 +48,7 @@ function App() {
     setCarouselKey((prevKey) => prevKey + 1);
   };
 
-  const handleTextDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleTextDelete = () => {
     setText('');
     setHighlightedWords([]);
     setDictionaryWord('');
@@ -207,7 +207,7 @@ function App() {
           <Button color="warning" variant="flat" onClick={() => setReadingTime(false)}>
             Quiz Me!
           </Button>
-          <Button color="danger" isIconOnly variant="flat" onClick={(e) => handleDelete(e)}>
+          <Button color="danger" isIconOnly variant="flat" onClick={() => handleDelete()}>
             <FaTrashAlt />
           </Button>
         </div>
